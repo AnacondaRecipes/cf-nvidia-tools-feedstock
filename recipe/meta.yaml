@@ -1,20 +1,18 @@
-context:
-  name: cf-nvidia-tools
-  version: "1.0.0"
+{% set name = "cf-nvidia-tools" %}
+{% set version = "1.0.0" %}
 
 package:
-  name: ${{ name|lower }}
-  version: ${{ version }}
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  - path: bin
-    target_directory: bin
+  path: .
 
 build:
   noarch: generic
   script:
     - ls -lah
-    - cp -r bin "$PREFIX/bin"
+    - cp -r bin "$PREFIX"
     - shellcheck "$PREFIX/bin/check-glibc"
   number: 0
 
@@ -25,17 +23,17 @@ requirements:
     - __unix
     - patchelf >=0.12
 
-tests:
-  - requirements:
-      run:
-        - dav1d-dev
-    script:
+test:
+  requires:
+    - dav1d
+  commands:
     - check-glibc || true
     - export c_stdlib_version="99.99.99"
     - check-glibc "${CONDA_PREFIX}"/lib/*.so.*
     # Also check that tool will exit 1 if c_stdlib_version is too old
     - export c_stdlib_version="0.0.1"
     - "[ $(check-glibc ${CONDA_PREFIX}/lib/*.so.* &>/dev/null; echo $?) -eq 1 ]"
+
 about:
   summary: NVIDIA's feedstock validation and linting tools for conda-forge
   description: >
@@ -45,9 +43,8 @@ about:
     for these tools at this time.
   license: Apache-2.0
   license_file: LICENSE
-  homepage: https://github.com/conda-forge/cf-nvidia-tools-feedstock
+  home: https://github.com/conda-forge/cf-nvidia-tools-feedstock
 
 extra:
-  feedstock-name: cf-nvidia-tools
   recipe-maintainers:
     - conda-forge/cuda
