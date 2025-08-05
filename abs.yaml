@@ -3,4 +3,4 @@ channels: [sk_test]
 upload_without_merge: True
 # without this, only the linux-64 noarch package will be uploaded
 # which is not what we want
-noarch_upload: [linux-64, linux-aarch64, win-64]
+noarch_upload: [linux-64, linux-aarch64]

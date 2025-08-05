@@ -11,6 +11,7 @@ source:
 
 build:
   noarch: generic
+  skip: true  # [win]
   script:
     - ls -lah
     - cp -r bin/* "$PREFIX/bin/"
@@ -21,7 +22,7 @@ build:
 
 requirements:
   build:
-    - shellcheck
+    - shellcheck  # [linux and x86_64]
   run:
     - patchelf >=0.12
 
