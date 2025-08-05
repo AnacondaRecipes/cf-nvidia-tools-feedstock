@@ -44,7 +44,12 @@ test:
     - export c_stdlib_version="0.0.1"
     - |
       if ls "${CONDA_PREFIX}"/lib/*.so.* 1> /dev/null 2>&1; then
-        [ $(check-glibc ${CONDA_PREFIX}/lib/*.so.* &>/dev/null; echo $?) -eq 1 ]
+        if check-glibc ${CONDA_PREFIX}/lib/*.so.* &>/dev/null; then
+          echo "Script should have failed with old glibc version"
+          exit 1
+        else
+          echo "Script correctly failed with old glibc version"
+        fi
       else
         echo "No shared libraries found to check"
       fi
