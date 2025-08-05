@@ -13,7 +13,8 @@ build:
   noarch: generic
   script:
     - ls -lah
-    - cp -r bin "$PREFIX/bin"
+    - cp -r bin/* "$PREFIX/bin/"
+    - ls -la "$PREFIX/bin/"
     - chmod +x "$PREFIX/bin/check-glibc"
     - shellcheck "$PREFIX/bin/check-glibc" || echo "shellcheck failed, but continuing build"
   number: 0
