@@ -1,14 +1,13 @@
-context:
-  name: cf-nvidia-tools
-  version: "1.0.0"
+{% set name = "cf-nvidia-tools" %}
+{% set version = "1.0.0" %}
 
 package:
-  name: ${{ name|lower }}
-  version: ${{ version }}
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  - path: bin
-    target_directory: bin
+  - folder: bin
+    path: bin
 
 build:
   noarch: generic
@@ -22,23 +21,22 @@ requirements:
   build:
     - shellcheck
   run:
-    - __unix
     - patchelf >=0.12
 
-tests:
-  - requirements:
-      run:
-        - dav1d-dev
-    script:
+test:
+  requires:
+    - dav1d
+  commands:
     - check-glibc || true
     - export c_stdlib_version="99.99.99"
     - check-glibc "${CONDA_PREFIX}"/lib/*.so.*
     # Also check that tool will exit 1 if c_stdlib_version is too old
     - export c_stdlib_version="0.0.1"
     - "[ $(check-glibc ${CONDA_PREFIX}/lib/*.so.* &>/dev/null; echo $?) -eq 1 ]"
+
 about:
   summary: NVIDIA's feedstock validation and linting tools for conda-forge
-  description: >
+  description: |
     This package contains CLI tools for validating and linting NVIDIA's conda recipes on
     conda-forge. For a description of the tools see the README in the package feedstock. The
     tools are hosted directly in the feedstock; there is no external source code repository
