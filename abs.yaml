@@ -3,7 +3,7 @@ channels: [sk_test]
 upload_without_merge: True
 # without this, only the linux-64 noarch package will be uploaded
 # which is not what we want
-noarch_upload: [all]
+noarch_upload: [linux-64, linux-aarch64]
 # Required for glibc >= 2.28
 pkg_build_image_tag: main-rockylinux-8
 build_env_vars:
