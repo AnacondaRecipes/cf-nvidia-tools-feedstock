@@ -13,8 +13,6 @@ build:
   noarch: generic
   skip: true  # [win or osx]
   script:
-    - ls -lah
-    - mkdir -p "$PREFIX/bin"  # [linux and aarch64]
     - cp -r bin/* "$PREFIX/bin/"
     - ls -la "$PREFIX/bin/"
     - chmod +x "$PREFIX/bin/check-glibc"
@@ -26,6 +24,7 @@ requirements:
     - shellcheck
   run:
     - patchelf >=0.12
+    - __unix   # [unix]
 
 test:
   requires:
