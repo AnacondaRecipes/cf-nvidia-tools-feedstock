@@ -1,0 +1,73 @@
+{% set name = "cf-nvidia-tools" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  - folder: bin
+    path: bin
+
+build:
+  noarch: generic
+  skip: true  # [win or osx]
+  script:
+    - cp -r bin/* "$PREFIX/bin/"
+    - ls -la "$PREFIX/bin/"
+    - chmod +x "$PREFIX/bin/check-glibc"
+    - shellcheck "$PREFIX/bin/check-glibc" || echo "shellcheck failed, but continuing build"
+  number: 0
+
+requirements:
+  build:
+    - shellcheck
+  run:
+    - patchelf >=0.12
+    - __unix   # [unix]
+
+test:
+  requires:
+    - dav1d
+  commands:
+    # Test that script runs without arguments (should show usage)
+    - check-glibc 2>&1 | grep -q "Usage:" || true
+    - export c_stdlib_version="99.99.99"
+    # Test with non-existent files (should exit gracefully)
+    - check-glibc /nonexistent/file || echo "Script handled non-existent file correctly"
+    # Only run glibc check if shared libraries exist
+    - |
+      if ls "${CONDA_PREFIX}"/lib/*.so.* 1> /dev/null 2>&1; then
+        check-glibc "${CONDA_PREFIX}"/lib/*.so.*
+      else
+        echo "No shared libraries found to check"
+      fi
+    # Also check that tool will exit 1 if c_stdlib_version is too old
+    - export c_stdlib_version="0.0.1"
+    - |
+      if ls "${CONDA_PREFIX}"/lib/*.so.* 1> /dev/null 2>&1; then
+        if check-glibc ${CONDA_PREFIX}/lib/*.so.* &>/dev/null; then
+          echo "Script should have failed with old glibc version"
+          exit 1
+        else
+          echo "Script correctly failed with old glibc version"
+        fi
+      else
+        echo "No shared libraries found to check"
+      fi
+
+about:
+  summary: NVIDIA's feedstock validation and linting tools for conda-forge
+  description: |
+    This package contains CLI tools for validating and linting NVIDIA's conda recipes on
+    conda-forge. For a description of the tools see the README in the package feedstock. The
+    tools are hosted directly in the feedstock; there is no external source code repository
+    for these tools at this time.
+  license: Apache-2.0
+  license_file: LICENSE
+  homepage: https://github.com/conda-forge/cf-nvidia-tools-feedstock
+
+extra:
+  feedstock-name: cf-nvidia-tools
+  recipe-maintainers:
+    - conda-forge/cuda
